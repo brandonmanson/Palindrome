@@ -30,12 +30,18 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark Sanitize String
+
 - (NSString *)sanitizeString:(NSString *)userInput {
-    NSString *whiteSpaceTrimmedString = [[NSString alloc]initWithString:[userInput stringByReplacingOccurrencesOfString:@" " withString:@""]];
-    NSString *sanitizedString = [whiteSpaceTrimmedString lowercaseString];
+    NSError *error = NULL;
+    NSString *lowerCaseString = [userInput lowercaseString];
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\W" options:NSRegularExpressionCaseInsensitive error:&error];
+    NSString *sanitizedString = [regex stringByReplacingMatchesInString:lowerCaseString options:0 range:NSMakeRange(0, [userInput length]) withTemplate:@""];
     NSLog(@"Sanitized string is %@", sanitizedString);
     return sanitizedString;
 }
+
+#pragma mark Reverse String
 
 - (NSString *)reverseString:(NSString *)sanitizedString {
     
@@ -46,43 +52,11 @@
     return reverseString;
 }
 
-- (BOOL)isValidFormat:(NSString *)stringToEvaluate {
-    NSUInteger numberOfMatches = [self numberOfMatches:stringToEvaluate];
-    NSLog(@"Number of matches is %lu", numberOfMatches);
-    if (numberOfMatches > 0) {
-        return NO;
-    } else {
-        return TRUE;
-    }
-}
 
-- (NSUInteger)numberOfMatches:(NSString *)userInput {
-    NSError *error = NULL;
-    
-    // Regex for checking for special characters
-    NSRegularExpression *containsSpecialCharactersRegex = [NSRegularExpression regularExpressionWithPattern:@"\\W" options:NSRegularExpressionCaseInsensitive error:&error];
-    
-    // Regex for checking for numbers
-    NSRegularExpression *containsNumbersRegex = [NSRegularExpression regularExpressionWithPattern:@"\\d" options:NSRegularExpressionCaseInsensitive error:&error];
-    
-    NSUInteger numberOfMatches = 0;
-    
-    // Check for special characters
-    NSUInteger numberOfMatchesForSpecialCharacters =[containsSpecialCharactersRegex numberOfMatchesInString:userInput
-                                                                                                    options:0
-                                                                                                      range:NSMakeRange(0, [userInput length])];
-    //Check for numbers
-    NSUInteger numberOfMatchesForNumbers = [containsNumbersRegex numberOfMatchesInString:userInput
-                                                                                 options:0
-                                                                                   range:NSMakeRange(0, [userInput length])];
-    numberOfMatches = numberOfMatchesForSpecialCharacters + numberOfMatchesForNumbers;
-    return numberOfMatches;
-}
-
-- (void)checkStringEquality:(NSString *)stringToCheck originalString:(NSString *)originalString {
-    NSString *sanitizedString = [self sanitizeString:stringToCheck];
+- (void)checkStringEquality:(NSString *)originalString {
+    NSString *sanitizedString = [self sanitizeString:originalString];
     NSString *reversedString = [self reverseString:sanitizedString];
-    if ([stringToCheck isEqualToString:reversedString]) {
+    if ([sanitizedString isEqualToString:reversedString]) {
         _isPalindromeLabel.text = [NSString stringWithFormat:@"%@ is a palindrome!", originalString];
     } else {
         _isPalindromeLabel.text = [NSString stringWithFormat:@"%@ is not a palindrome", originalString];
@@ -90,13 +64,10 @@
 }
 
 - (void)checkForPalindrome:(NSString *)userInput {
-    NSString *sanitizedString = [self sanitizeString:userInput];
     if ([userInput isEqualToString:@""]) {
         _isPalindromeLabel.text = @"Input cannot be empty. Please enter a string.";
-    } else if ([self isValidFormat:sanitizedString]) {
-        [self checkStringEquality:sanitizedString originalString:userInput];
     } else {
-        _isPalindromeLabel.text = @"Input cannot contain special characters or numbers";
+        [self checkStringEquality:userInput];
     }
 
     

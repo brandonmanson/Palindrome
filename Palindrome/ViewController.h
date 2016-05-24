@@ -15,9 +15,7 @@
 - (void)checkForPalindrome:(NSString *)userInput;
 - (NSString *)sanitizeString:(NSString *)userInput;
 - (NSString *)reverseString:(NSString *)sanitizedString;
-- (NSUInteger)numberOfMatches:(NSString *)userInput;
-- (void)checkStringEquality:(NSString *)stringToCheck originalString:(NSString *)originalString;
-- (void)checkAgainstRegularExpressions:(NSString *)stringToEvaluate;
+- (void)checkStringEquality:(NSString *)originalString;
 
 @property (weak, nonatomic) IBOutlet UILabel *isPalindromeLabel;
 @property (weak, nonatomic) IBOutlet UITextField *userInputTextField;
